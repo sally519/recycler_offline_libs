@@ -1,0 +1,2 @@
+# recycler_offline_libs
+一个flutter的h5离线包版本管理库
