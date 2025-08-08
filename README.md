@@ -57,7 +57,7 @@ H5 资源、静态资源包等场景。
 
 ### 1. 实现数据模型
 
-根据服务端接口格式，确保返回的数据能正确解析为 `RspOfflineLibInfo` 模型
+根据服务端接口格式，参考示例 `RspOfflineLibInfo` 
 
 ### 2. 实现 OfflineVersionManager 子类
 
@@ -67,8 +67,8 @@ class MyOfflineVersionManager extends OfflineVersionManager {
   Future<List<OfflineLibs>> fetchAllOfflineLibs() async {
     // 实现从服务端获取离线包列表的逻辑
     final response = await Dio().get('你的离线包列表接口');
-    final rsp = RspOfflineLibInfo.fromJson(response.data);
-    return rsp.records ?? [];
+    List<OfflineLibs> rsp = RspOfflineLibInfo.fromJson(response.data);
+    return rsp;
   }
 }
 ```
@@ -93,11 +93,6 @@ void getLocalVersion(String packageId) async {
   print('当前版本: $version');
 }
 
-// 获取离线包存储路径
-void getLibPath(String packageId, String version) async {
-  String path = await OfflineLibsHelper.getPackageDir(packageId, version);
-  print('离线包路径: $path');
-}
 ```
 
 ## 存储结构
