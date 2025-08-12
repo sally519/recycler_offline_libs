@@ -57,7 +57,7 @@ H5 资源、静态资源包等场景。
 
 ### 1. 实现数据模型
 
-根据服务端接口格式，参考示例 `RspOfflineLibInfo` 
+根据服务端接json实体类实现离线包数据模型包，参考示例 `RspOfflineLibInfo` 
 
 ### 2. 实现 OfflineVersionManager 子类
 
