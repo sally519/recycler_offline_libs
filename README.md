@@ -102,10 +102,7 @@ void checkAndUpdateOfflineLibs() async {
   if (result) {
     print('离线包更新完成');
   }
-}
-
-// 初始化离线包路径管理(可以不使用，但路径需自己写死)
-void initOfflineRouterPath() async {
+  // 初始化离线包路径管理(可以不使用，但路径需自己写死)
   await OfflinePathManager().init();
 }
 
