@@ -10,6 +10,7 @@ H5 资源、静态资源包等场景。
 - 从 ZIP 包自动解压并更新离线资源
 - 统一的离线包信息模型和管理接口
 - 支持批量更新所有离线包
+- 离线包下载解压完成后，自动记录包 ID、版本、根目录及主页面路径，路径映射信息存储在本地文件中，应用重启后无需重新登记
 
 ## 核心类说明
 
@@ -53,11 +54,27 @@ H5 资源、静态资源包等场景。
 - `updateAllOfflineLibs()`：批量更新所有需要更新的离线包
 - `downloadOfflineLibLocalPath()`：下载离线包到本地临时路径
 
+### OfflinePathManager
+
+离线包路径管理类，负责离线包路径的注册和查询。
+
+主要方法：
+
+- `registerPath(
+  packageId: packageId,
+  version: version,
+  rootPath: rootPath,
+  mainPageRelativePath: mainPageRelativePath,
+  )`：在离线包下载解压完成的逻辑中（在OfflineLibsHelper的解压回调里），调用registerPath()登记路径
+- `getRootPath(packageId)`: 获取离线包根目录路径
+- ❌ `getMainPagePath(packageId)`: 获取离线包主页面完整路径（目前由于离线包解压路径还没有约定，暂时不支持使用）
+- ❌ `getMainPageUrl(packageId)`: 获取离线包主页面 URL （目前由于离线包解压路径还没有约定，暂时不支持使用）
+
 ## 使用步骤
 
 ### 1. 实现数据模型
 
-根据服务端接json实体类实现离线包数据模型包，参考示例 `RspOfflineLibInfo` 
+根据服务端接json实体类实现离线包数据模型包，参考示例 `RspOfflineLibInfo`
 
 ### 2. 实现 OfflineVersionManager 子类
 
@@ -87,10 +104,9 @@ void checkAndUpdateOfflineLibs() async {
   }
 }
 
-// 获取指定离线包的本地版本
-void getLocalVersion(String packageId) async {
-  String version = await OfflineLibsHelper.getCurrentVersion(packageId);
-  print('当前版本: $version');
+// 初始化离线包路径管理(可以不使用，但路径需自己写死)
+void initOfflineRouterPath() async {
+  await OfflinePathManager().init();
 }
 
 ```
@@ -101,6 +117,7 @@ void getLocalVersion(String packageId) async {
 
 ```plaintext
 应用支持目录/offline_h5/
+  ├── path_mapping.json      # 路径映射信息文件
   ├── [packageId]/           # 离线包唯一标识目录
   │   ├── version.json       # 版本信息文件
   │   └── [version]/         # 版本号目录
