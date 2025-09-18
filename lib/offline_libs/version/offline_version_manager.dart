@@ -25,8 +25,7 @@ abstract class OfflineVersionManager {
         String localPath = await downloadOfflineLibLocalPath(lib);
         // 如果本地版本为0.0.0或小于远程版本
         await OfflineLibsHelper.updatePackageFromZip(
-          packageName,
-          version,
+          lib,
           localPath,
         );
         // 删除下载的临时文件

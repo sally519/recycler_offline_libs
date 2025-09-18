@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:recycler_offline_libs/offline_libs/path/offline_path_manager.dart';
+import 'package:recycler_offline_libs/offline_libs/version/offline_libs.dart';
 
 class OfflineLibsHelper {
   /// 获取离线包资源目录
@@ -40,10 +41,11 @@ class OfflineLibsHelper {
 
   /// 更新某个离线包（解压并更新 version.json）
   static Future<void> updatePackageFromZip(
-    String packageName,
-    String version,
+    OfflineLibs lib,
     String zipPath,
   ) async {
+    final packageName = lib.getOfflineLibId();
+    final version = lib.getOfflineLibsVersion();
     final pkgDir = await getPackageDir(packageName, version);
 
     // 解压
@@ -74,6 +76,33 @@ class OfflineLibsHelper {
     }
 
     // 如果 zip 里没有 version.json，就生成一个
+    await genericVersionFile(hasVersionFile, packageName, version, pkgDir);
+
+    await setOfflineLibsRouterPath(lib, packageName, version, pkgDir);
+
+    print("离线包 [$packageName] 已更新到版本 $version");
+  }
+
+  /// 设置离线包的路由路径
+  /// 通过 OfflinePathManager 登记路径信息
+  /// 这样可以通过包名获取主页面路径
+  static Future<void> setOfflineLibsRouterPath(OfflineLibs lib,
+      String packageName, String version, String pkgDir) async {
+    final mainPageRelativePath = lib.getOfflineLibsMainPage();
+    // 登记路径
+    await OfflinePathManager().registerPath(
+      packageId: packageName,
+      version: version,
+      rootPath: pkgDir,
+      mainPageRelativePath: mainPageRelativePath,
+    );
+  }
+
+  /// 生成 version.json 文件
+  /// 如果 hasVersionFile 为 true，表示 zip 包里已经有 version.json 文件
+  /// 则直接拷贝过去；否则生成一个新的 version.json 文件
+  static Future<void> genericVersionFile(bool hasVersionFile,
+      String packageName, String version, String pkgDir) async {
     if (!hasVersionFile) {
       final versionFile =
           File('${(await getOfflineDirPath())}/$packageName/version.json');
@@ -91,25 +120,5 @@ class OfflineLibsHelper {
         await versionFile.writeAsString(await versionFileInPkg.readAsString());
       }
     }
-
-    print("离线包 [$packageName] 已更新到版本 $version");
   }
-
-  // static Future<void> copyZipFromAssets() async {
-  //   final offlineDir = await OfflineLibsHelper.getOfflineDirPath();
-  //   final zipPath = '$offlineDir/offline.zip';
-  //
-  //   // 如果文件已存在，可以选择跳过
-  //   if (!File(zipPath).existsSync()) {
-  //     print("文件不存在，开始拷贝...");
-  //     final byteData = await rootBundle.load('assets/libs/dist.zip');
-  //     await File(zipPath).writeAsBytes(
-  //       byteData.buffer
-  //           .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes),
-  //     );
-  //     print("已将 offline.zip 从 assets 拷贝到: $zipPath");
-  //   } else {
-  //     print("文件已存在，跳过拷贝");
-  //   }
-  // }
 }
