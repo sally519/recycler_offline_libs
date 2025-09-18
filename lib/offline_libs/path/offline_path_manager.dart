@@ -75,12 +75,14 @@ class OfflinePathManager {
   }
 
   // 获取主页面完整路径
+  @Deprecated('目前版本推荐使用 getRootPath根据zip离线包的压缩路径自行拼装')
   String? getMainPagePath(String packageId) {
     final info = _pathMap[packageId];
-    return info?.mainPagePath;
+    return 'file://${info?.mainPagePath}';
   }
 
   // 获取带file协议的完整路径
+  @Deprecated('目前版本推荐使用 getRootPath根据zip离线包的压缩路径自行拼装')
   String? getMainPageUrl(String packageId) {
     final path = getMainPagePath(packageId);
     return path != null ? 'file://$path' : null;
@@ -88,7 +90,7 @@ class OfflinePathManager {
 
   // 获取离线包根目录
   String? getRootPath(String packageId) {
-    return _pathMap[packageId]?.rootPath;
+    return 'file://${_pathMap[packageId]?.rootPath}';
   }
 
   // 获取当前版本
