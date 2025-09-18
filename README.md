@@ -66,7 +66,7 @@ H5 资源、静态资源包等场景。
   rootPath: rootPath,
   mainPageRelativePath: mainPageRelativePath,
   )`：在离线包下载解压完成的逻辑中（在OfflineLibsHelper的解压回调里），调用registerPath()登记路径
-- `getRootPath(packageId)`: 获取离线包根目录路径
+- `getRootPath(packageId)`: 获取解压后的离线包根目录路径
 - ❌ `getMainPagePath(packageId)`: 获取离线包主页面完整路径（目前由于离线包解压路径还没有约定，暂时不支持使用）
 - ❌ `getMainPageUrl(packageId)`: 获取离线包主页面 URL （目前由于离线包解压路径还没有约定，暂时不支持使用）
 
