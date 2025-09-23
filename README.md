@@ -114,25 +114,30 @@ void checkAndUpdateOfflineLibs() async {
 }
 
 // 初始化本地 Web 服务器
-final webServer = LocalWebServerManager();
+final OfflineServerManager serverManager = OfflineServerManager();
 
 // 启动服务器
 void startLocalServer() async {
-  bool isStarted = await webServer.startServer(port: 8080);
-  if (isStarted) {
-    print('本地 Web 服务器启动成功，端口：8080');
-    // 获取资源访问 URL
-    String mainPageUrl = webServer.getLocalUrl('package1', relativePath: 'index.html');
-    print('主页面访问地址：$mainPageUrl'); // 输出：http://localhost:8080/package1/index.html
-  }
+  serverManager.startServer('20250923');
 }
 
 // 应用退出时停止服务器
 void stopLocalServer() async {
-await webServer.stopServer();
-print('本地 Web 服务器已停止');
+  await webServer.stopServer();
+  print('本地 Web 服务器已停止');
 }
 
+//打开离线包
+void openLibs(libId) {
+  Get.to(() =>
+      WebviewH5Screen(
+        url:
+        '${serverManager
+            .getServerStatus(libId)
+            ?.serverUrl}/index.html',
+        isFullScreen: true,
+      ));
+}
 ```
 
 ## 存储结构
