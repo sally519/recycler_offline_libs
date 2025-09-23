@@ -13,6 +13,10 @@ dependencies:
   archive: ^3.4.10 # 用于解压缩文件
   path_provider: ^2.0.10 # 用于获取临时目录
   dio: ^5.4.3 # 用于下载 PDF
+  shelf: ^1.4.0          # Dart官方HTTP服务器框架
+  shelf_static: ^1.1.2   # 静态资源托管工具
+  shelf_router: ^1.1.0   # 路由管理（可选）
+  http: ^1.5.0          # 用于检查服务器状态
 
 dev_dependencies:
   flutter_test:
