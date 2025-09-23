@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:recycler_offline_libs/offline_libs/path/offline_path_info.dart';
 
@@ -17,7 +18,7 @@ class OfflinePathManager {
   final Map<String, OfflinePathInfo> _pathMap = {};
 
   // 存储路径文件
-  late File _pathStorageFile;
+  File? _pathStorageFile;
 
   // 初始化
   Future<void> init() async {
@@ -29,9 +30,9 @@ class OfflinePathManager {
 
   // 从本地加载路径映射
   Future<void> _loadFromStorage() async {
-    if (await _pathStorageFile.exists()) {
+    if (null != _pathStorageFile && await _pathStorageFile!.exists()) {
       try {
-        final jsonStr = await _pathStorageFile.readAsString();
+        final jsonStr = await _pathStorageFile!.readAsString();
         final List<dynamic> jsonList = jsonDecode(jsonStr);
         _pathMap.clear();
         for (var item in jsonList) {
@@ -39,7 +40,9 @@ class OfflinePathManager {
           _pathMap[info.packageId] = info;
         }
       } catch (e) {
-        print('加载路径映射失败: $e');
+        if (kDebugMode) {
+          print('加载路径映射失败: $e');
+        }
       }
     }
   }
@@ -47,15 +50,17 @@ class OfflinePathManager {
   // 保存路径映射到本地
   Future<void> _saveToStorage() async {
     try {
-      if (!await _pathStorageFile.exists()) {
+      if (null == _pathStorageFile || !await _pathStorageFile!.exists()) {
         final dir = await getApplicationSupportDirectory();
         final pathFile = File('${dir.path}/offline_h5/path_mapping.json');
         _pathStorageFile = pathFile;
       }
       final jsonList = _pathMap.values.map((e) => e.toJson()).toList();
-      await _pathStorageFile.writeAsString(jsonEncode(jsonList));
+      await _pathStorageFile?.writeAsString(jsonEncode(jsonList));
     } catch (e) {
-      print('保存路径映射失败: $e');
+      if (kDebugMode) {
+        print('保存路径映射失败: $e');
+      }
     }
   }
 
