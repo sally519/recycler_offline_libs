@@ -47,6 +47,11 @@ class OfflinePathManager {
   // 保存路径映射到本地
   Future<void> _saveToStorage() async {
     try {
+      if (!await _pathStorageFile.exists()) {
+        final dir = await getApplicationSupportDirectory();
+        final pathFile = File('${dir.path}/offline_h5/path_mapping.json');
+        _pathStorageFile = pathFile;
+      }
       final jsonList = _pathMap.values.map((e) => e.toJson()).toList();
       await _pathStorageFile.writeAsString(jsonEncode(jsonList));
     } catch (e) {
