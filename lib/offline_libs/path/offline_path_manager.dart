@@ -107,4 +107,10 @@ class OfflinePathManager {
   String? getVersion(String packageId) {
     return _pathMap[packageId]?.version;
   }
+
+  // 在OfflinePathManager中添加
+  Future<Map<String, OfflinePathInfo>> getAllPackageInfo() async {
+    // 返回不可修改的副本，保护内部数据
+    return Map.unmodifiable(_pathMap);
+  }
 }
