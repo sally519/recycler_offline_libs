@@ -118,9 +118,12 @@ class OfflineServerManager {
   }
 
   /// 4. 查询指定packageId的服务器状态
-  OfflineServerInfo? getServerStatus(String packageId) {
+  Future<OfflineServerInfo?> getServerStatus(String packageId) async {
     if (!_runningServers.containsKey(packageId)) return null;
-    return _runningServers[packageId]!['info'] as OfflineServerInfo;
+    HttpServer server = _runningServers[packageId]!['server'] as HttpServer;
+    OfflineServerInfo info = _runningServers[packageId]!['info'];
+    info.isRunning = await _isServerAlive(server);
+    return info;
   }
 
   /// 辅助：查找可用端口（8080~8085）
@@ -140,5 +143,16 @@ class OfflineServerManager {
       }
     }
     return -1; // 无可用端口
+  }
+
+  Future<bool> _isServerAlive(HttpServer server) async {
+    try {
+      final socket = await Socket.connect(server.address.host, server.port,
+          timeout: const Duration(milliseconds: 500));
+      socket.destroy();
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 }
