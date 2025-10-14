@@ -41,11 +41,11 @@ class OfflineServerManager {
       final rootPath = rootUrl.replaceAll(RegExp(r'^file://'), ''); // 移除协议前缀
 
       // 步骤3：验证目录是否存在
-      // final dir = Directory(rootPath);
-      // if (!await dir.exists()) {
-      //   debugPrint("启动服务器失败：离线包目录不存在，path=$rootPath");
-      //   return null;
-      // }
+      final dir = Directory(rootPath);
+      if (!await dir.exists()) {
+        debugPrint("启动服务器失败：离线包目录不存在，path=$rootPath");
+        return null;
+      }
 
       // 步骤4：查找可用端口（8080~8085）
       final port = await _findAvailablePort();
